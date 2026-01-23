@@ -1,5 +1,7 @@
 # RTTY Runner by EC5W
 
+![RTTY Runner Screenshot](screenshot.png)
+
 ## English
 
 A Windows application that simulates RTTY (RadioTeletype) contest runs for calibrating and testing RTTY decoders like MMTTY, Fldigi, or WSJT-X.

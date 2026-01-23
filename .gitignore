@@ -1,7 +1,13 @@
 # Build results
 bin/
 obj/
+publish/
+publish*/
 publish_*/
+*.pdb
+
+# Release binaries (kept outside repo)
+RTTYRunner_*.exe
 
 # IDE
 .vs/
