@@ -32,6 +32,16 @@ public enum QsoState
 }
 
 /// <summary>
+/// Lado del QSO que se transmite por audio.
+/// </summary>
+public enum TransmitSide
+{
+    Both,           // Ambos lados (comportamiento por defecto)
+    CallerOnly,     // Solo la estación que llama CQ (MyCallsign)
+    RespondersOnly  // Solo las estaciones que contestan (DX)
+}
+
+/// <summary>
 /// Representa un QSO completo con tiempos y mensajes.
 /// </summary>
 public class QsoRecord

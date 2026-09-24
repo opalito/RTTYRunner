@@ -27,6 +27,7 @@ public partial class MainForm : Form
     private ComboBox _cboAudioDevice = null!;
     private ComboBox _cboLanguage = null!;
     private ComboBox _cboContestType = null!;
+    private ComboBox _cboTransmitSide = null!;
     private Button _btnStart = null!;
     private Button _btnStop = null!;
     private Button _btnTest = null!;
@@ -42,6 +43,7 @@ public partial class MainForm : Form
     private Label _lblVolLabel = null!;
     private Label _lblLangLabel = null!;
     private Label _lblContestLabel = null!;
+    private Label _lblTransmitLabel = null!;
     private GroupBox _grpStation = null!;
     private GroupBox _grpRtty = null!;
     private GroupBox _grpAudio = null!;
@@ -120,7 +122,7 @@ public partial class MainForm : Form
         {
             Text = Strings.StationGroup,
             Location = new Point(5, 5),
-            Size = new Size(200, 115)
+            Size = new Size(200, 145)
         };
 
         _lblCallLabel = new Label { Text = Strings.CallsignLabel, Location = new Point(10, 22), AutoSize = true };
@@ -152,7 +154,18 @@ public partial class MainForm : Form
         _cboContestType.Items.AddRange(new object[] { "CQ WPX", "CQ WW" });
         _cboContestType.SelectedIndex = 0;
 
-        _grpStation.Controls.AddRange(new Control[] { _lblCallLabel, _txtCallsign, _lblLangLabel, _cboLanguage, _lblContestLabel, _cboContestType });
+        _lblTransmitLabel = new Label { Text = Strings.TransmitSideLabel, Location = new Point(10, 112), AutoSize = true };
+        _cboTransmitSide = new ComboBox
+        {
+            Location = new Point(75, 109),
+            Size = new Size(110, 23),
+            DropDownWidth = 150,
+            DropDownStyle = ComboBoxStyle.DropDownList
+        };
+        FillTransmitSideItems();
+        _cboTransmitSide.SelectedIndex = 0;
+
+        _grpStation.Controls.AddRange(new Control[] { _lblCallLabel, _txtCallsign, _lblLangLabel, _cboLanguage, _lblContestLabel, _cboContestType, _lblTransmitLabel, _cboTransmitSide });
 
         // Grupo de configuración RTTY
         _grpRtty = new GroupBox
@@ -292,6 +305,23 @@ public partial class MainForm : Form
         return panel;
     }
 
+    /// <summary>
+    /// Rellena el desplegable de lado a transmitir con los textos del idioma actual,
+    /// conservando la selección.
+    /// </summary>
+    private void FillTransmitSideItems()
+    {
+        int selected = _cboTransmitSide.SelectedIndex;
+        _cboTransmitSide.Items.Clear();
+        _cboTransmitSide.Items.AddRange(new object[]
+        {
+            Strings.TransmitBoth,
+            Strings.TransmitCallerOnly,
+            Strings.TransmitRespondersOnly
+        });
+        if (selected >= 0) _cboTransmitSide.SelectedIndex = selected;
+    }
+
     private void UpdateLanguageUI()
     {
         _grpStation.Text = Strings.StationGroup;
@@ -302,6 +332,8 @@ public partial class MainForm : Form
         _lblCallLabel.Text = Strings.CallsignLabel;
         _lblLangLabel.Text = Strings.LanguageLabel;
         _lblContestLabel.Text = Strings.ContestTypeLabel;
+        _lblTransmitLabel.Text = Strings.TransmitSideLabel;
+        FillTransmitSideItems();
         _lblDeviceLabel.Text = Strings.SoundCardLabel;
         _lblVolLabel.Text = Strings.VolumeLabel;
         _chkNoise.Text = Strings.HfNoiseLabel;
@@ -422,6 +454,17 @@ public partial class MainForm : Form
                 : ContestType.CqWwRtty;
         };
 
+        // Cambio de lado a transmitir
+        _cboTransmitSide.SelectedIndexChanged += (s, e) =>
+        {
+            _contestSimulator.TransmitSide = _cboTransmitSide.SelectedIndex switch
+            {
+                1 => TransmitSide.CallerOnly,
+                2 => TransmitSide.RespondersOnly,
+                _ => TransmitSide.Both
+            };
+        };
+
         _numMarkFreq.ValueChanged += (s, e) => _rttyGenerator.MarkFrequency = (double)_numMarkFreq.Value;
         _numShift.ValueChanged += (s, e) => _rttyGenerator.Shift = (double)_numShift.Value;
         _numBaudRate.ValueChanged += (s, e) => _rttyGenerator.BaudRate = (double)_numBaudRate.Value;
@@ -490,6 +533,7 @@ public partial class MainForm : Form
         _cboAudioDevice.Enabled = enabled;
         _cboLanguage.Enabled = enabled;
         _cboContestType.Enabled = enabled;
+        _cboTransmitSide.Enabled = enabled;
     }
 
     private void ContestSimulator_MessageStarted(object? sender, MessageProgressEventArgs e)

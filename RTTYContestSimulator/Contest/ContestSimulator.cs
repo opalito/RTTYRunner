@@ -24,6 +24,13 @@ public class ContestSimulator
     public bool IsRunning => _simulationTask != null && !_simulationTask.IsCompleted;
     public ContestType ContestType { get; set; } = ContestType.CqWpxRtty;
 
+    /// <summary>
+    /// Qué lado del QSO se transmite por audio: ambos, solo la estación que llama CQ
+    /// (MyCallsign) o solo las estaciones que contestan (DX).
+    /// Los mensajes del lado silenciado se sustituyen por una pausa de la misma duración.
+    /// </summary>
+    public TransmitSide TransmitSide { get; set; } = TransmitSide.Both;
+
     // Configuración de tiempos (en ms)
     public int MinDelayBetweenQsos { get; set; } = 500;
     public int MaxDelayBetweenQsos { get; set; } = 2000;
@@ -114,7 +121,7 @@ public class ContestSimulator
         // 1. Enviar CQ
         SetState(QsoState.SendingCq);
         string cqMessage = $" CQ CQ {contestName} DE {MyCallsign} {MyCallsign} K ";
-        await SendMessageCharByChar(cqMessage, ct);
+        await SendCallerMessage(cqMessage, ct);
 
         // 2. Simular respuesta del DX
         int responseDelay = _random.Next(MinResponseDelay, MaxResponseDelay);
@@ -122,7 +129,7 @@ public class ContestSimulator
         SetState(QsoState.WaitingForCall);
 
         string dxResponse = $" {MyCallsign} DE {dxCall} {dxCall} ";
-        await SendMessageCharByChar(dxResponse, ct);
+        await SendDxMessage(dxResponse, ct);
 
         // 3. Enviar reporte (formato depende del concurso)
         responseDelay = _random.Next(MinResponseDelay, MaxResponseDelay);
@@ -141,7 +148,7 @@ public class ContestSimulator
             // Asumimos que el operador es DX (zona CQ)
             myReport = $" {dxCall} 599 599 14 14 K "; // Zona 14 = Europa occidental
         }
-        await SendMessageCharByChar(myReport, ct);
+        await SendCallerMessage(myReport, ct);
 
         // 4. Recibir confirmación del DX
         responseDelay = _random.Next(MinResponseDelay, MaxResponseDelay);
@@ -169,7 +176,7 @@ public class ContestSimulator
                 dxQsl = $" 599 {dxSerial:D3} {cqZone:D2} TU ";
             }
         }
-        await SendMessageCharByChar(dxQsl, ct);
+        await SendDxMessage(dxQsl, ct);
 
         // 5. Enviar TU y siguiente CQ
         responseDelay = _random.Next(MinResponseDelay, MaxResponseDelay);
@@ -177,7 +184,7 @@ public class ContestSimulator
         SetState(QsoState.SendingTu);
 
         string tuMessage = $" TU {MyCallsign} CQ ";
-        await SendMessageCharByChar(tuMessage, ct);
+        await SendCallerMessage(tuMessage, ct);
 
         // Registrar QSO completado
         var qsoRecord = new QsoRecord
@@ -252,6 +259,38 @@ public class ContestSimulator
             // Sin ruido, solo esperar
             await Task.Delay(delayMs, ct);
         }
+    }
+
+    /// <summary>
+    /// Envía un mensaje de la estación que llama (MyCallsign), o lo silencia
+    /// según <see cref="TransmitSide"/>.
+    /// </summary>
+    private Task SendCallerMessage(string message, CancellationToken ct)
+    {
+        return TransmitSide == TransmitSide.RespondersOnly
+            ? SkipMessage(message, ct)
+            : SendMessageCharByChar(message, ct);
+    }
+
+    /// <summary>
+    /// Envía un mensaje de la estación que contesta (DX), o lo silencia
+    /// según <see cref="TransmitSide"/>.
+    /// </summary>
+    private Task SendDxMessage(string message, CancellationToken ct)
+    {
+        return TransmitSide == TransmitSide.CallerOnly
+            ? SkipMessage(message, ct)
+            : SendMessageCharByChar(message, ct);
+    }
+
+    /// <summary>
+    /// Sustituye un mensaje silenciado por una pausa (con ruido si está activo)
+    /// de la misma duración que tendría el mensaje, para mantener el ritmo del QSO.
+    /// </summary>
+    private Task SkipMessage(string message, CancellationToken ct)
+    {
+        int charDurationMs = (int)(7.5 * 1000 / _rttyGenerator.BaudRate);
+        return PlayNoiseDelay(charDurationMs * message.Length, ct);
     }
 
     private async Task SendMessageCharByChar(string message, CancellationToken ct)

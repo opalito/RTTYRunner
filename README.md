@@ -17,6 +17,7 @@ A Windows application that simulates RTTY (RadioTeletype) contest runs for calib
   - Shift (default 170 Hz)
   - Baud rate (default 45.45)
   - Volume and noise level
+- **Transmit Side Selection**: Transmit both sides of the QSO, only the calling station (CQ, report, TU) or only the responding stations (call and QSL). Muted messages are replaced by a pause of the same length so the QSO rhythm is preserved
 - **Sound Card Selection**: Choose your audio output device
 - **Bilingual Interface**: Spanish and English
 
@@ -40,8 +41,9 @@ A Windows application that simulates RTTY (RadioTeletype) contest runs for calib
 3. Select your sound card
 4. Configure your callsign
 5. Choose contest type (CQ WPX or CQ WW)
-6. Click "Start Run" to begin the simulation
-7. Connect the audio output to your RTTY decoder software
+6. Choose which side to transmit: both, caller only or responders only
+7. Click "Start Run" to begin the simulation
+8. Connect the audio output to your RTTY decoder software
 
 ### Downloads
 
@@ -76,6 +78,7 @@ Una aplicacion Windows que simula runs de concurso RTTY (RadioTeletipo) para cal
   - Shift (por defecto 170 Hz)
   - Velocidad en baudios (por defecto 45.45)
   - Volumen y nivel de ruido
+- **Seleccion de Lado a Transmitir**: Transmite ambos lados del QSO, solo la estacion que llama (CQ, reporte, TU) o solo las estaciones que contestan (llamada y QSL). Los mensajes silenciados se sustituyen por una pausa de la misma duracion para mantener el ritmo del QSO
 - **Seleccion de Tarjeta de Sonido**: Elige tu dispositivo de salida de audio
 - **Interfaz Bilingue**: Espanol e Ingles
 
@@ -99,8 +102,9 @@ Una aplicacion Windows que simula runs de concurso RTTY (RadioTeletipo) para cal
 3. Selecciona tu tarjeta de sonido
 4. Configura tu indicativo
 5. Elige el tipo de concurso (CQ WPX o CQ WW)
-6. Haz clic en "Iniciar Run" para comenzar la simulacion
-7. Conecta la salida de audio a tu software decodificador RTTY
+6. Elige que lado transmitir: ambos, solo quien llama o solo quien contesta
+7. Haz clic en "Iniciar Run" para comenzar la simulacion
+8. Conecta la salida de audio a tu software decodificador RTTY
 
 ### Descargas
 

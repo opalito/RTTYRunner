@@ -63,6 +63,22 @@ public static class Strings
         ? "Tipo:"
         : "Type:";
 
+    public static string TransmitSideLabel => CurrentLanguage == Language.Spanish
+        ? "Transmitir:"
+        : "Transmit:";
+
+    public static string TransmitBoth => CurrentLanguage == Language.Spanish
+        ? "Ambos lados"
+        : "Both sides";
+
+    public static string TransmitCallerOnly => CurrentLanguage == Language.Spanish
+        ? "Solo llamada (CQ)"
+        : "Caller only (CQ)";
+
+    public static string TransmitRespondersOnly => CurrentLanguage == Language.Spanish
+        ? "Solo respuestas"
+        : "Responders only";
+
     // Buttons
     public static string StartButton => CurrentLanguage == Language.Spanish
         ? "Iniciar Run"
